@@ -73,10 +73,10 @@
 <body>
 
 <div class="container">
-    <h1>Order Decision Form</h1>
+    <h1>Accept or Decline the Order? Decision Support</h1>
     <form action="" method="post">
-        <label>Miles per Gallon (MPG):</label>
-        <input type="text" name="mpg_rate" value="<?php echo isset($_POST['mpg_rate']) ? $_POST['mpg_rate'] : 30; ?>">
+        <label>Your Car Miles per Gallon (MPG):</label>
+        <input type="text" name="mpg_rate" value="<?php echo isset($_POST['mpg_rate']) ? $_POST['mpg_rate'] : 31; ?>">
 
         <label>Miles for Order:</label>
         <input type="text" name="miles_for_order" value="<?php echo isset($_POST['miles_for_order']) ? $_POST['miles_for_order'] : ''; ?>">
@@ -88,10 +88,10 @@
         <input type="text" name="fuel_price" value="<?php echo isset($_POST['fuel_price']) ? $_POST['fuel_price'] : 2.8; ?>">
 
         <label>Additional Costs / Mile (Maintenance, Insurance, etc.):</label>
-        <input type="text" name="average_price_per_mile" value="<?php echo isset($_POST['average_price_per_mile']) ? $_POST['average_price_per_mile'] : ''; ?>">
+        <input type="text" name="average_price_per_mile" value="<?php echo isset($_POST['average_price_per_mile']) ? $_POST['average_price_per_mile'] : 0.21; ?>">
 
         <label>Potential Reward (USD):</label>
-        <input type="text" name="reward_for_order" value="<?php echo isset($_POST['reward_for_order']) ? $_POST['reward_for_order'] : ''; ?>">
+        <input type="text" name="reward_for_order" value="<?php echo isset($_POST['reward_for_order']) ? $_POST['reward_for_order'] : 8; ?>">
 
         <input type="submit" value="Submit">
     </form>
@@ -110,11 +110,12 @@
         // Calculate fuel cost
         $fuel_cost = ($miles_for_order / $mpg_rate) * $fuel_price;
 
-        // Calculate the cost per hour, assuming the user inputs the time in minutes
-        $price_per_hour = ($average_price_per_mile * $miles_for_order) + ($fuel_cost / ($time_for_order / 60));
-
         // Calculate total cost
         $total_cost = $fuel_cost + ($miles_for_order * $average_price_per_mile);
+
+        // Calc benefits
+        $absolute_benefit = $reward_for_order - $total_cost;
+        $relative_benefit = ($absolute_benefit / $reward_for_order) * 100;
 
         // Make a decision
         if ($reward_for_order >= $total_cost) {
@@ -123,9 +124,8 @@
             $decision = "Decline";
         }
 
-        // Calc benefits
-        $absolute_benefit = $reward_for_order - $total_cost;
-        $relative_benefit = ($absolute_benefit / $reward_for_order) * 100;
+        // Calculate the cost per hour, assuming the user inputs the execution time in minutes
+        $price_per_hour = $absolute_benefit / ($time_for_order / 60);
 
         // Display the result
         echo "<div class='result'>";
